@@ -58,6 +58,7 @@ class _EncryptorState extends State<Encryptor> {
     _txtController.clear();
     setState(() {
       _clearBtnShowed = false;
+      _txt = '';
     });
   }
 
