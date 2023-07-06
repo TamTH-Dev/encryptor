@@ -12,15 +12,20 @@ class Encryptor extends StatefulWidget {
 }
 
 class _EncryptorState extends State<Encryptor> {
+  late TextEditingController _txtController;
   Algorithm? _algorithm;
   String _txt = '';
-  final TextEditingController _txtController = TextEditingController();
   bool _clearBtnShowed = false;
+
+  @override
+  void initState() {
+    _txtController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void dispose() {
     _txtController.dispose();
-
     super.dispose();
   }
 
@@ -31,6 +36,13 @@ class _EncryptorState extends State<Encryptor> {
   }
 
   void _onChangeTxt(String txt) {
+    setState(() {
+      _txt = txt;
+    });
+    _shouldShowClearBtn(txt);
+  }
+
+  void _shouldShowClearBtn(String txt) {
     if (txt.isEmpty && _clearBtnShowed) {
       setState(() {
         _clearBtnShowed = false;
@@ -40,10 +52,6 @@ class _EncryptorState extends State<Encryptor> {
         _clearBtnShowed = true;
       });
     }
-
-    setState(() {
-      _txt = txt;
-    });
   }
 
   void _clearTxt() {
