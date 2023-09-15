@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DropdownButton;
 import 'package:flutter/services.dart';
+
+import 'dropdown-button.dart';
 
 class Encryptor extends StatefulWidget {
   const Encryptor({super.key});
@@ -63,14 +65,14 @@ class _EncryptorState extends State<Encryptor> {
   }
 
   Future<void> _copyToClipboard() async {
-    if (result.trim().isEmpty) {
+    if (_result.trim().isEmpty) {
       _notify('Select algorithm and enter the text you want to encrypt');
 
       return;
     }
 
     try {
-      final data = ClipboardData(text: result);
+      final data = ClipboardData(text: _result);
       await Clipboard.setData(data);
       FocusManager.instance.primaryFocus?.unfocus();
       _notify('Copied to clipboard');
@@ -89,7 +91,7 @@ class _EncryptorState extends State<Encryptor> {
     );
   }
 
-  String get result {
+  String get _result {
     if (_algorithm == null || _txt.trim().isEmpty) {
       return '';
     }
@@ -127,12 +129,14 @@ class _EncryptorState extends State<Encryptor> {
     return digest.toString();
   }
 
+  Color get _primaryColor => Theme.of(context).primaryColor;
+
   @override
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Encryptor'),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: _primaryColor,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -143,14 +147,19 @@ class _EncryptorState extends State<Encryptor> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<Algorithm>(
+              DropdownButton<Algorithm>(
                 value: _algorithm,
                 onChanged: _onChangeAlgorithm,
                 isExpanded: true,
                 isDense: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                buttonStyleData: ButtonStyleData(
+                  height: 56.0,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: _primaryColor, width: 1.5),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
                 ),
+                underline: const SizedBox.shrink(),
                 items: Algorithm.values
                     .map((v) => DropdownMenuItem<Algorithm>(
                           value: v,
@@ -171,6 +180,7 @@ class _EncryptorState extends State<Encryptor> {
                       icon: Icon(
                         Icons.cancel,
                         color: Colors.black54.withOpacity(0.5),
+                        size: 20.0,
                       ),
                     ),
                   ),
@@ -182,7 +192,10 @@ class _EncryptorState extends State<Encryptor> {
               Container(
                 height: 170.0,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black38),
+                  border: Border.all(
+                    color: const Color(0xFFFA5F67),
+                    width: 2.0,
+                  ),
                   borderRadius: const BorderRadius.all(Radius.circular(4.0)),
                 ),
                 padding: const EdgeInsets.symmetric(
@@ -190,7 +203,7 @@ class _EncryptorState extends State<Encryptor> {
                   vertical: 12.0,
                 ),
                 child: Text(
-                  result,
+                  _result,
                   maxLines: 8,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -207,8 +220,7 @@ class _EncryptorState extends State<Encryptor> {
                   onPressed: _copyToClipboard,
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith(
-                      (states) => Theme.of(context).primaryColor,
-                    ),
+                        (states) => _primaryColor),
                   ),
                   child: const Text(
                     'Copy',
